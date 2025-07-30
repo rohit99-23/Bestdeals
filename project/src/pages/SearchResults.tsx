@@ -131,6 +131,28 @@ export default function SearchResults() {
         </div>
       </div>
 
+      {/* Category Filter Bar */}
+      <div className="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-2">
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => window.location.search = `?category=${cat.id}`}
+            className={`flex items-center px-4 py-2 rounded-full border transition-colors duration-200 text-sm font-medium ${category === cat.id ? 'bg-orange-500 text-white border-orange-500' : 'bg-white text-gray-700 border-gray-300 hover:bg-orange-50 hover:border-orange-400'}`}
+          >
+            <span className="mr-2 text-lg">{cat.icon}</span>
+            {cat.name}
+          </button>
+        ))}
+        {category && (
+          <button
+            onClick={() => window.location.search = ''}
+            className="ml-2 px-3 py-2 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold hover:bg-gray-300"
+          >
+            Clear
+          </button>
+        )}
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Filters Sidebar */}
         <div className={`lg:w-1/4 ${showFilters ? 'block' : 'hidden lg:block'}`}>

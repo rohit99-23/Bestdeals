@@ -3,8 +3,10 @@ import Cookies from 'js-cookie';
 
 interface User {
   id: string;
-  email: string;
   name: string;
+  email: string;
+  password?: string;
+  phone?: string;
 }
 
 interface AuthContextType {
@@ -12,10 +14,23 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  forgotPassword: (email: string) => Promise<boolean>;
+  resetPassword: (email: string, newPassword: string) => Promise<boolean>;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper function to get stored users
+const getStoredUsers = (): User[] => {
+  const users = localStorage.getItem('users');
+  return users ? JSON.parse(users) : [];
+};
+
+// Helper function to save users
+const saveUsers = (users: User[]) => {
+  localStorage.setItem('users', JSON.stringify(users));
+};
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -26,7 +41,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userData = localStorage.getItem('userData');
     
     if (token && userData) {
-      setUser(JSON.parse(userData));
+      const currentUser = JSON.parse(userData);
+      // Verify user still exists in our stored users
+      const users = getStoredUsers();
+      const userExists = users.find(u => u.id === currentUser.id && u.email === currentUser.email);
+      
+      if (userExists) {
+        setUser(currentUser);
+      } else {
+        // User no longer exists, clear session
+        logout();
+      }
     }
     setIsLoading(false);
   }, []);
@@ -36,22 +61,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock validation
-      if (email && password.length >= 6) {
-        const userData = {
-          id: Math.random().toString(36).substr(2, 9),
-          email,
-          name: email.split('@')[0]
-        };
-        
-        const token = 'jwt_token_' + Math.random().toString(36).substr(2, 15);
-        
-        Cookies.set('authToken', token, { expires: 7 });
-        localStorage.setItem('userData', JSON.stringify(userData));
-        setUser(userData);
-        return true;
+      // Get stored users
+      const users = getStoredUsers();
+      
+      // Find user by email
+      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      
+      if (!existingUser) {
+        return false; // User doesn't exist
       }
-      return false;
+      
+      // Check password
+      if (existingUser.password !== password) {
+        return false; // Wrong password
+      }
+      
+      // Create user data without password
+      const userData = {
+        id: existingUser.id,
+        email: existingUser.email,
+        name: existingUser.name
+      };
+      
+      const token = 'jwt_token_' + Math.random().toString(36).substr(2, 15);
+      
+      Cookies.set('authToken', token, { expires: 7 });
+      localStorage.setItem('userData', JSON.stringify(userData));
+      setUser(userData);
+      return true;
     } catch (error) {
       return false;
     }
@@ -62,22 +99,88 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock validation
-      if (name && email && password.length >= 6) {
-        const userData = {
-          id: Math.random().toString(36).substr(2, 9),
-          email,
-          name
-        };
-        
-        const token = 'jwt_token_' + Math.random().toString(36).substr(2, 15);
-        
-        Cookies.set('authToken', token, { expires: 7 });
-        localStorage.setItem('userData', JSON.stringify(userData));
-        setUser(userData);
-        return true;
+      // Get stored users
+      const users = getStoredUsers();
+      
+      // Check if user already exists
+      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (existingUser) {
+        return false; // User already exists
       }
+      
+      // Create new user
+      const newUser: User = {
+        id: Math.random().toString(36).substr(2, 9),
+        email: email.toLowerCase(),
+        name,
+        password
+      };
+      
+      // Add to stored users
+      users.push(newUser);
+      saveUsers(users);
+      
+      // Create user data without password
+      const userData = {
+        id: newUser.id,
+        email: newUser.email,
+        name: newUser.name
+      };
+      
+      const token = 'jwt_token_' + Math.random().toString(36).substr(2, 15);
+      
+      Cookies.set('authToken', token, { expires: 7 });
+      localStorage.setItem('userData', JSON.stringify(userData));
+      setUser(userData);
+      return true;
+    } catch (error) {
       return false;
+    }
+  };
+
+  const forgotPassword = async (email: string): Promise<boolean> => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get stored users
+      const users = getStoredUsers();
+      
+      // Check if user exists
+      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      
+      if (!existingUser) {
+        return false; // User doesn't exist
+      }
+      
+      // In a real app, you would send an email with reset link
+      // For demo purposes, we'll just return true
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
+
+  const resetPassword = async (email: string, newPassword: string): Promise<boolean> => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get stored users
+      const users = getStoredUsers();
+      
+      // Find user
+      const userIndex = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+      
+      if (userIndex === -1) {
+        return false; // User doesn't exist
+      }
+      
+      // Update password
+      users[userIndex].password = newPassword;
+      saveUsers(users);
+      
+      return true;
     } catch (error) {
       return false;
     }
@@ -90,7 +193,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      login, 
+      signup, 
+      logout, 
+      forgotPassword, 
+      resetPassword, 
+      isLoading 
+    }}>
       {children}
     </AuthContext.Provider>
   );
