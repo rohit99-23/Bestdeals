@@ -2,7 +2,10 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, TrendingUp, Zap, Star } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { categories, trendingDeals, bestDeals } from '../data/mockData';
+import { categories, trendingDeals, bestDeals, platforms, getTopDealsByPlatform } from '../data/mockData';
+
+const platformOrder = ['amazon', 'flipkart', 'meesho', 'myntra', 'ajio'] as const;
+type PlatformKey = typeof platformOrder[number];
 
 export default function Homepage() {
   const navigate = useNavigate();
@@ -67,6 +70,28 @@ export default function Homepage() {
           </div>
         </div>
       </section>
+
+      {/* Platform Top Deals Sections */}
+      {platformOrder.map((platformKey) => {
+        const platform = platforms[platformKey as PlatformKey];
+        const deals = getTopDealsByPlatform(platform.name, 4);
+        if (!deals.length) return null;
+        return (
+          <section key={platformKey} className="py-12 bg-white border-b">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex items-center mb-8">
+                <img src={platform.logo} alt={platform.name} className="w-10 h-10 rounded-full mr-4" />
+                <h2 className="text-2xl font-bold text-gray-900">Top Deals on {platform.name}</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {deals.map((product) => (
+                  <ProductCard key={product.id + platformKey} product={product} />
+                ))}
+              </div>
+            </div>
+          </section>
+        );
+      })}
 
       {/* Trending Deals */}
       <section className="py-16 bg-white">
