@@ -58,6 +58,7 @@ export default function Profile() {
 
   const [userRating] = useState(4.8);
   const [totalReviews] = useState(156);
+  const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -92,6 +93,17 @@ export default function Profile() {
       showToast('Location updated successfully!', 'success');
     } catch (error) {
       showToast('Failed to get location. Please check permissions.', 'error');
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setAvatar(ev.target?.result as string);
+        showToast('Profile picture updated!', 'success');
+      };
+      reader.readAsDataURL(e.target.files[0]);
     }
   };
 
@@ -131,8 +143,22 @@ export default function Profile() {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-lg">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-4">
-                  <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-orange-500 rounded-full flex items-center justify-center">
-                    <User className="h-10 w-10 text-white" />
+                  <div className="w-20 h-20 bg-gradient-to-r from-cyan-500 to-orange-500 rounded-full flex items-center justify-center relative overflow-hidden">
+                    {avatar ? (
+                      <img src={avatar} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                    ) : (
+                      <ThumbsUp className="h-10 w-10 text-white" />
+                    )}
+                    <label htmlFor="avatar-upload" className="absolute bottom-0 right-0 bg-white p-1 rounded-full cursor-pointer shadow-md border border-gray-200">
+                      <Edit className="h-4 w-4 text-cyan-500" />
+                      <input
+                        id="avatar-upload"
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarChange}
+                      />
+                    </label>
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900">{user.name}</h2>

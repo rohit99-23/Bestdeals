@@ -12,23 +12,27 @@ export const categories = [
 export const platforms = {
   amazon: {
     name: 'Amazon',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg'
+    logo: '/amazon-logo.png'
   },
   flipkart: {
     name: 'Flipkart',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Flipkart_logo.png'
+    logo: '/flipkart-logo.png'
   },
   meesho: {
     name: 'Meesho',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Meesho_logo.png'
+    logo: '/meesho-logo.png'
   },
   myntra: {
     name: 'Myntra',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Myntra_logo.png'
+    logo: '/myntra-logo.png'
   },
   ajio: {
     name: 'Ajio',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Ajio_logo.png'
+    logo: '/ajio-logo.png'
+  },
+  bestdeals: {
+    name: 'BESTDEALS',
+    logo: '/logo- (1).png'
   }
 };
 

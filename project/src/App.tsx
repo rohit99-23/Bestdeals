@@ -20,9 +20,13 @@ import Checkout from './pages/Checkout';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import AffiliateDisclaimer from './pages/AffiliateDisclaimer';
+
 import { Toaster } from './components/Toast';
+import SmartBot from './components/SmartBot';
+
 
 function App() {
+  const [isBotOpen, setIsBotOpen] = React.useState(false);
   return (
     <Router>
       <AuthProvider>
@@ -51,6 +55,16 @@ function App() {
               </main>
               <Footer />
               <Toaster />
+              {/* Floating SmartBot Button */}
+              <button
+                className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4 rounded-full shadow-lg hover:scale-110 transition-all duration-300 focus:outline-none"
+                style={{ boxShadow: '0 4px 24px 0 rgba(180, 70, 255, 0.15)' }}
+                onClick={() => setIsBotOpen(true)}
+                aria-label="Open SmartBot"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0-1.657 1.343-3 3-3s3 1.343 3 3-1.343 3-3 3-3-1.343-3-3zm0 0c0-1.657-1.343-3-3-3s-3 1.343-3 3 1.343 3 3 3 3-1.343 3-3zm0 8c-4.418 0-8-1.79-8-4V7a2 2 0 012-2h12a2 2 0 012 2v8c0 2.21-3.582 4-8 4z" /></svg>
+              </button>
+              <SmartBot isOpen={isBotOpen} onClose={() => setIsBotOpen(false)} />
             </div>
           </LocationProvider>
         </CartProvider>

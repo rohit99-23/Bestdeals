@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Heart, User, Menu, X, ThumbsUp } from 'lucide-react';
+import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 
@@ -63,10 +63,15 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2 group flex-shrink-0">
             <div className="relative">
-              <ThumbsUp className="h-8 w-8 text-cyan-500 transform rotate-12 group-hover:rotate-0 transition-transform duration-300" />
+              <img
+                src="/logo- (1).png"
+                alt="BESTDEALS Logo"
+                className="h-10 w-10 rounded-full shadow-lg border-2 border-cyan-400 bg-white object-contain"
+                style={{ background: 'white' }}
+              />
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-cyan-400 to-orange-500 rounded-full animate-pulse"></div>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 via-cyan-400 to-orange-500 bg-clip-text text-transparent group-hover:scale-105 transition-transform duration-300">
+            <span className="text-2xl font-bold text-gray-900 group-hover:scale-105 transition-transform duration-300">
               BESTDEALS
             </span>
           </Link>

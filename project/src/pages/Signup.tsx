@@ -95,8 +95,8 @@ export default function Signup() {
         
         if (userExists) {
           showToast('An account with this email already exists. Please sign in instead.', 'error');
-        } else {
-          showToast('Failed to create account. Please try again.', 'error');
+      } else {
+        showToast('Failed to create account. Please try again.', 'error');
         }
       }
     } catch (error) {
@@ -349,7 +349,7 @@ export default function Signup() {
             >
               {isLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Creating account...</span>
                 </>
               ) : (
