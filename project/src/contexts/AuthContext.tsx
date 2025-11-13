@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile } from 'firebase/auth';
+import app from '../firebase';
 
 interface User {
   id: string;
@@ -96,44 +98,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signup = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Get stored users
-      const users = getStoredUsers();
-      
-      // Check if user already exists
-      const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      if (existingUser) {
-        return false; // User already exists
+      const auth = getAuth(app);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // Set display name
+      if (auth.currentUser) {
+        await updateProfile(auth.currentUser, { displayName: name });
       }
-      
-      // Create new user
-      const newUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: email.toLowerCase(),
-        name,
-        password
-      };
-      
-      // Add to stored users
-      users.push(newUser);
-      saveUsers(users);
-      
-      // Create user data without password
+      // Set user data
       const userData = {
-        id: newUser.id,
-        email: newUser.email,
-        name: newUser.name
+        id: userCredential.user.uid,
+        email: userCredential.user.email || '',
+        name: name
       };
-      
-      const token = 'jwt_token_' + Math.random().toString(36).substr(2, 15);
-      
-      Cookies.set('authToken', token, { expires: 7 });
+      Cookies.set('authToken', await userCredential.user.getIdToken(), { expires: 7 });
       localStorage.setItem('userData', JSON.stringify(userData));
       setUser(userData);
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      // Optionally, log error for debugging
+      console.error('Firebase signup error:', error);
       return false;
     }
   };
